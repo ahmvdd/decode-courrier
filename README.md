@@ -1,29 +1,93 @@
+<div align="center">
+
 # Décode ton courrier
 
-Décode ton courrier aide les étudiants étrangers et les nouveaux arrivants en France à comprendre les courriers officiels. L’application explique le courrier dans la langue choisie (français simple, anglais, arabe, espagnol, portugais, chinois, turc ou russe), précise les options et les échéances, propose une réponse administrative en français et en fournit une traduction de compréhension.
+### Comprends tes démarches. Réponds en français.
 
-## Lancer le projet
+Les courriers officiels français, expliqués simplement dans ta langue.
 
-1. Installez Node.js 20 ou plus récent.
-2. Installez les dépendances : `npm install`
-3. Copiez `.env.example` vers `.env.local`, puis renseignez `OPENAI_API_KEY`.
-4. Démarrez l’application : `npm run dev`
-5. Ouvrez [http://localhost:3000](http://localhost:3000).
+**Français simple · English · العربية · Español · Português · 中文 · Türkçe · Русский**
 
-`OPENAI_MODEL` est facultatif et vaut `gpt-4o` par défaut. La clé API reste côté serveur. Les images sont traitées en mémoire pour l’appel d’analyse et ne sont pas enregistrées par l’application.
+</div>
+
+---
+
+Décode ton courrier accompagne les étudiants étrangers et les nouveaux arrivants en France face aux lettres de la CAF, des impôts, de la CPAM, de France Travail et d’autres organismes.
+
+Ajoute une photo ou colle le texte. L’application explique le courrier, met en évidence les dates et les démarches, puis prépare un brouillon de réponse en français avec sa traduction.
+
+## Le parcours
+
+```mermaid
+flowchart LR
+    A[Photo ou texte] --> B[Masquer les données personnelles]
+    B --> C[Consentement]
+    C --> D[Analyse du courrier]
+    D --> E[Résumé et échéances]
+    D --> F[Options et documents]
+    D --> G[Réponse en français et traduction]
+    E --> H[Rappel agenda]
+```
+
+## Ce que l’application propose
+
+- **Explication multilingue** : résumé facile à lire dans l’une des huit langues proposées.
+- **Masquage avant envoi** : dessine des rectangles noirs sur le nom, l’adresse ou les références du dossier. Les masques sont intégrés à l’image avant l’analyse.
+- **Actions et conséquences** : repère les options mentionnées dans le courrier, les dates limites et les pièces à préparer.
+- **Réponse prête à adapter** : brouillon administratif en français, avec traduction pour le comprendre.
+- **Lecture audio** : écoute le résumé dans la langue choisie.
+- **Rappel de date limite** : télécharge un fichier calendrier `.ics` avec une alarme trois jours avant, ou ouvre Google Agenda.
+
+## Démarrer en local
+
+Prérequis : Node.js 20 ou plus récent.
+
+```bash
+git clone https://github.com/ahmvdd/decode-courrier.git
+cd decode-courrier
+npm install
+cp .env.example .env.local
+```
+
+Ajoute ta clé dans `.env.local` :
+
+```dotenv
+OPENAI_API_KEY=ta_cle_api
+OPENAI_MODEL=gpt-4o
+```
+
+Puis lance l’application :
+
+```bash
+npm run dev
+```
+
+Ouvre [http://localhost:3000](http://localhost:3000).
+
+## Configuration
+
+| Variable | Requise | Valeur par défaut | Description |
+| --- | :---: | --- | --- |
+| `OPENAI_API_KEY` | Oui | — | Clé utilisée uniquement par les routes serveur. |
+| `OPENAI_MODEL` | Non | `gpt-4o` | Modèle d’analyse multimodale. |
+
+## Confidentialité
+
+- Le consentement est obligatoire avant toute analyse, photo ou texte.
+- Pour une photo, les rectangles noirs sont appliqués dans le navigateur avant l’envoi. Seule l’image masquée est transmise à l’API.
+- L’application ne crée pas de copie des courriers sur son serveur. Le contenu est transmis à l’API OpenAI pour analyse.
+- `.env.local` et `node_modules` sont exclus de Git.
 
 ## Stack
 
-- Next.js App Router et TypeScript
-- Tailwind CSS 4
-- API OpenAI avec sortie JSON structurée et synthèse vocale
-- Rappels de date limite au format iCalendar (.ics) et lien Google Agenda
-- Compatible avec un déploiement Vercel : ajoutez `OPENAI_API_KEY` (et éventuellement `OPENAI_MODEL`) aux variables d’environnement du projet.
+Next.js App Router · TypeScript · Tailwind CSS · API OpenAI · déploiement compatible Vercel.
 
-## Confidentialité et masquage
+Pour déployer sur Vercel, importe le dépôt et ajoute `OPENAI_API_KEY` dans les variables d’environnement du projet. `OPENAI_MODEL` est facultative.
 
-Avant l’analyse d’une photo, l’utilisateur peut masquer des informations avec des rectangles noirs. L’image composée dans le navigateur, masques inclus, est la seule image envoyée à l’API. Une case de consentement est obligatoire avant toute analyse, y compris pour du texte collé.
+## Vérification
 
-## Captures
+```bash
+npm run build
+```
 
-Ajoutez ici des captures de l’accueil mobile et de la page de résultat après avoir lancé l’application.
+Les trois courriers d’exemple se trouvent dans [`test-courriers/`](test-courriers/). Ils contiennent des données fictives.
