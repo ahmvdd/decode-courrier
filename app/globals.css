@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-:root { color-scheme: light; --ink: #171717; --paper: #f8f7f4; --line: #deddd8; }
+:root { color-scheme: light; --ink: #171717; --paper: #f8f7f4; --line: #deddd8; --accent: #C2410C; }
 * { box-sizing: border-box; }
 html { min-width: 320px; background: var(--paper); }
 body { margin: 0; color: var(--ink); background: var(--paper); font-family: Arial, Helvetica, sans-serif; font-size: 18px; }
@@ -17,3 +17,37 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .minimal-app textarea, .minimal-app select { border-color: #bdbbb5; border-width: 1px; border-radius: 6px; }
 .minimal-app .bg-slate-50, .minimal-app .bg-slate-100 { background-color: #f5f4f0; }
 .minimal-app .text-sm, .minimal-app .text-base { font-size: 18px !important; line-height: 1.5; }
+.minimal-app { font-size: calc(18px * var(--text-scale, 1)); }
+.minimal-app .text-sm, .minimal-app .text-base { font-size: calc(18px * var(--text-scale, 1)) !important; }
+.minimal-app .text-lg { font-size: calc(20px * var(--text-scale, 1)) !important; }
+.minimal-app .text-xl { font-size: calc(24px * var(--text-scale, 1)) !important; }
+.minimal-app .text-2xl { font-size: calc(30px * var(--text-scale, 1)) !important; }
+.minimal-app .text-3xl { font-size: calc(36px * var(--text-scale, 1)) !important; }
+.minimal-app .text-4xl { font-size: calc(42px * var(--text-scale, 1)) !important; }
+.a11y-control { min-height: 48px; min-width: 54px; padding: 8px 14px; border: 2px solid #171717; border-radius: 6px; background: #fff; color: #111; font-weight: 800; }
+.a11y-control:disabled { opacity: .5; }
+.result-section { margin-top: 14px; border: 2px solid #deddd8; border-radius: 6px; padding: 0 16px 16px; background: #fff; }
+.result-section > summary { min-height: 56px; padding: 14px 0; font-size: calc(20px * var(--text-scale, 1)); font-weight: 800; cursor: pointer; }
+.result-section > summary:focus-visible { outline: 3px solid #111; outline-offset: 3px; }
+.todo-card { padding: 20px; border: 3px solid currentColor; border-radius: 8px; }
+.todo-high { color: #8b0000; background: #fff0f0; }
+.todo-medium { color: #7a3c00; background: #fff3dd; }
+.todo-low { color: #075c20; background: #eaf8ed; }
+.deadline-display { margin: 0; font-size: clamp(32px, 7vw, 42px); line-height: 1.15; font-weight: 900; overflow-wrap: anywhere; }
+.listen-primary { width: 100%; min-height: 56px; margin-top: 12px; padding: 10px 20px; border: 2px solid #111; border-radius: 8px; background: #111; color: white; font-size: 20px; font-weight: 800; }
+.listen-primary:disabled { opacity: .6; }
+.brand-mark { background: var(--accent); }
+.minimal-secondary, .secondary-action { min-height: 48px; padding: 10px 16px; border: 2px solid var(--accent); border-radius: 6px; background: #fff; color: var(--accent); font-weight: 800; text-align: center; }
+.minimal-secondary:hover:not(:disabled), .secondary-action:hover { background: #fff7ed; }
+.minimal-app a { color: var(--accent); }
+.action-buttons { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 170px), 1fr)); gap: 12px; }
+.action-buttons > * { width: 100%; justify-content: center; }
+.contrast-high { color: #fff !important; background: #000 !important; }
+.contrast-high .minimal-card, .contrast-high .result-section, .contrast-high .todo-card, .contrast-high .result-section [class*="bg-slate"], .contrast-high .minimal-app section { color: #fff !important; background: #000 !important; border-color: #ffeb3b !important; }
+.contrast-high .todo-high, .contrast-high .todo-medium, .contrast-high .todo-low { color: #ffeb3b !important; }
+.contrast-high .deadline-display, .contrast-high a, .contrast-high .text-slate-600, .contrast-high .text-slate-700, .contrast-high .text-neutral-600 { color: #ffeb3b !important; }
+.contrast-high .a11y-control, .contrast-high textarea, .contrast-high select { color: #ffeb3b !important; background: #000 !important; border-color: #ffeb3b !important; }
+.contrast-high .listen-primary { color: #ffeb3b !important; background: #000 !important; border-color: #ffeb3b !important; }
+.contrast-high button:not(.listen-primary):not(.a11y-control) { color: #ffeb3b; border-color: #ffeb3b; background: #000; }
+.contrast-high .minimal-primary { color: #ffeb3b; background: #000; border-color: #ffeb3b; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; } }

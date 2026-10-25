@@ -9,6 +9,62 @@ const languageLabels: Record<Language, string> = {
   portugais: "Português", chinois: "中文", turc: "Türkçe", russe: "Русский",
 };
 
+const homeCopy: Record<Language, { title: string; subtitle: string; example: string; next: string }> = {
+  "français simple": { title: "Ton courrier, expliqué simplement.", subtitle: "Ce qu'il dit, ce que tu dois faire, et avant quand. À lire ou à écouter, dans ta langue.", example: "Essayer avec un exemple", next: "Et maintenant ?" },
+  anglais: { title: "Your letter, explained simply.", subtitle: "What it says, what to do, and by when. Read or listen in your language.", example: "Try an example", next: "What next?" },
+  arabe: { title: "رسالتك، بشرح بسيط.", subtitle: "ماذا تقول، وما الذي عليك فعله، ومتى. اقرأ أو استمع بلغتك.", example: "جرّب مثالاً", next: "ماذا بعد؟" },
+  espagnol: { title: "Tu carta, explicada fácilmente.", subtitle: "Qué dice, qué tienes que hacer y para cuándo. Léela o escúchala en tu idioma.", example: "Probar con un ejemplo", next: "¿Y ahora qué?" },
+  portugais: { title: "A tua carta, explicada de forma simples.", subtitle: "O que diz, o que tens de fazer e até quando. Lê ou ouve na tua língua.", example: "Experimentar um exemplo", next: "E agora?" },
+  chinois: { title: "简单读懂你的信件。", subtitle: "了解信件内容、要做什么以及截止时间。用你的语言阅读或收听。", example: "试试示例", next: "接下来怎么办？" },
+  turc: { title: "Mektubun kolayca açıklansın.", subtitle: "Ne yazıyor, ne yapmalısın ve ne zamana kadar? Kendi dilinde oku veya dinle.", example: "Bir örnek dene", next: "Şimdi ne yapmalı?" },
+  russe: { title: "Письмо простыми словами.", subtitle: "Что в нём сказано, что нужно сделать и к какому сроку. Читай или слушай на своём языке.", example: "Попробовать на примере", next: "Что дальше?" },
+};
+
+const exampleLetter = `Trésor public – Service des impôts (exemple fictif)\nAvis de relance\nMontant restant à payer : 706,00 €\nMerci de payer avant le 10 novembre 2026. Si vous avez déjà payé, ignorez cet avis. Si vous avez des difficultés, vous pouvez demander un délai de paiement au service des impôts.`;
+
+function removeDeadlineFromAction(value: string) {
+  const date = String.raw`(?:\d{1,2}(?:er)?\s+\p{L}+\s+\d{4}|\p{L}+\s+\d{1,2},?\s+\d{4}|\d{1,2}[./-]\d{1,2}[./-]\d{2,4})`;
+  return value
+    .replace(new RegExp(String.raw`\s*(?:avant(?:\s+le)?|d'ici(?:\s+au)?|au plus tard le|before|by|no later than|hasta|antes del?|до)\s+${date}[,.]?`, "giu"), "")
+    .replace(/\s+([,.!?;:])/g, "$1").replace(/[,.!?;:\s]+$/, "").trim();
+}
+
+const accessibilityUi: Record<Language, { increase: string; decrease: string; contrast: string; controls: string; todo: string; resultReady: string; primaryAction: string }> = {
+  "français simple": { increase: "A+", decrease: "A−", contrast: "Contraste élevé", controls: "Réglages d’accessibilité", todo: "À FAIRE", resultReady: "Résultat prêt. Consulte la première action et sa date limite." , primaryAction: "Action principale" },
+  anglais: { increase: "A+", decrease: "A−", contrast: "High contrast", controls: "Accessibility settings", todo: "TO DO", resultReady: "Result ready. See the main action and its deadline first.", primaryAction: "Main action" },
+  arabe: { increase: "A+", decrease: "A−", contrast: "تباين عالٍ", controls: "إعدادات تسهيل الاستخدام", todo: "ما يجب فعله", resultReady: "النتيجة جاهزة. ابدأ بالإجراء الرئيسي وموعده النهائي.", primaryAction: "الإجراء الرئيسي" },
+  espagnol: { increase: "A+", decrease: "A−", contrast: "Alto contraste", controls: "Ajustes de accesibilidad", todo: "POR HACER", resultReady: "Resultado listo. Consulta primero la acción principal y su fecha límite.", primaryAction: "Acción principal" },
+  portugais: { increase: "A+", decrease: "A−", contrast: "Alto contraste", controls: "Definições de acessibilidade", todo: "A FAZER", resultReady: "Resultado pronto. Consulta primeiro a ação principal e o prazo.", primaryAction: "Ação principal" },
+  chinois: { increase: "A+", decrease: "A−", contrast: "高对比度", controls: "无障碍设置", todo: "待办事项", resultReady: "结果已准备好。请先查看主要事项和截止日期。", primaryAction: "主要事项" },
+  turc: { increase: "A+", decrease: "A−", contrast: "Yüksek kontrast", controls: "Erişilebilirlik ayarları", todo: "YAPILACAK", resultReady: "Sonuç hazır. Önce ana işlemi ve son tarihi incele.", primaryAction: "Ana işlem" },
+  russe: { increase: "A+", decrease: "A−", contrast: "Высокая контрастность", controls: "Настройки доступности", todo: "ЧТО СДЕЛАТЬ", resultReady: "Результат готов. Сначала проверь главное действие и срок.", primaryAction: "Главное действие" },
+};
+
+const shareUi: Record<Language, { button: string; title: string; from: string; says: string; action: string; deadline: string; amount: string; copy: string; copied: string }> = {
+  "français simple": { button: "Envoyer à un proche", title: "Résumé de mon courrier", from: "Expéditeur", says: "Le courrier dit", action: "À faire", deadline: "Date limite", amount: "Montant", copy: "Copier", copied: "Message copié." },
+  anglais: { button: "Send to someone I trust", title: "My letter summary", from: "Sender", says: "The letter says", action: "To do", deadline: "Deadline", amount: "Amount", copy: "Copy", copied: "Message copied." },
+  arabe: { button: "أرسل إلى شخص مقرّب", title: "ملخص رسالتي", from: "الجهة المرسلة", says: "ماذا تقول الرسالة", action: "ما يجب فعله", deadline: "الموعد النهائي", amount: "المبلغ", copy: "نسخ", copied: "تم نسخ الرسالة." },
+  espagnol: { button: "Enviar a alguien de confianza", title: "Resumen de mi carta", from: "Remitente", says: "La carta dice", action: "Qué hacer", deadline: "Fecha límite", amount: "Importe", copy: "Copiar", copied: "Mensaje copiado." },
+  portugais: { button: "Enviar a alguém de confiança", title: "Resumo da minha carta", from: "Remetente", says: "A carta diz", action: "O que fazer", deadline: "Prazo", amount: "Montante", copy: "Copiar", copied: "Mensagem copiada." },
+  chinois: { button: "发送给信任的人", title: "我的信件摘要", from: "发件方", says: "信件内容", action: "待办事项", deadline: "截止日期", amount: "金额", copy: "复制", copied: "消息已复制。" },
+  turc: { button: "Yakınıma gönder", title: "Mektubumun özeti", from: "Gönderen", says: "Mektupta yazan", action: "Yapılacak", deadline: "Son tarih", amount: "Tutar", copy: "Kopyala", copied: "Mesaj kopyalandı." },
+  russe: { button: "Отправить близкому", title: "Кратко о письме", from: "Отправитель", says: "В письме говорится", action: "Что сделать", deadline: "Срок", amount: "Сумма", copy: "Скопировать", copied: "Сообщение скопировано." },
+};
+
+function removePersonalDetails(value: string) {
+  return value
+    .replace(/\b(?:M(?:me|lle|\.)?|Monsieur|Madame)\s+[\p{Lu}][\p{L}'’-]+(?:\s+[\p{Lu}][\p{L}'’-]+){0,2}/gu, "une personne")
+    .replace(/\b[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}\b/g, "")
+    .replace(/\b(?:\+?\d[ .()-]*){8,}\b/g, "")
+    .replace(/\b\d{1,5}\s+(?:bis\s+|ter\s+)?(?:rue|avenue|av\.?|boulevard|bd\.?|impasse|allée|chemin|place|route)\b[^,.;\n]*/gi, "une adresse personnelle")
+    .replace(/\b\d{5}\s+[\p{L}'’-]+(?:[ -][\p{L}'’-]+){0,3}\b/gu, "")
+    .replace(/\s+/g, " ").trim();
+}
+
+function firstTwoSentences(value: string) {
+  return value.match(/[^.!?]+[.!?]+|[^.!?]+$/g)?.slice(0, 2).join(" ").trim() || value.trim();
+}
+
 const ui: Record<Language, Record<string, string>> = {
   "français simple": {
     tagline: "Les démarches, dans ta langue", title: "Comprends ton courrier dans ta langue. Réponds en français parfait.", intro: "Prends une photo nette de ton courrier officiel, ou colle son texte ici.",
@@ -162,10 +218,22 @@ export default function CourrierApp({ showResult = false }: { showResult?: boole
   const [error, setError] = useState("");
   const [analysis, setAnalysis] = useState<Analysis | null>(null);
   const [speaking, setSpeaking] = useState(false);
+  const [showShareFallback, setShowShareFallback] = useState(false);
+  const [shareCopied, setShareCopied] = useState(false);
+  const [textScale, setTextScale] = useState(1);
+  const [highContrast, setHighContrast] = useState(false);
   const rtl = language === "arabe";
   const t = ui[language];
+  const a11y = accessibilityUi[language];
+  const shareText = shareUi[language];
 
   useEffect(() => {
+    try {
+      const savedScale = window.localStorage.getItem("courrier-text-scale");
+      const parsedScale = savedScale ? Number(savedScale) : 1;
+      if (Number.isFinite(parsedScale)) setTextScale(Math.min(1.6, Math.max(1, parsedScale)));
+      setHighContrast(window.localStorage.getItem("courrier-high-contrast") === "true");
+    } catch { /* Le stockage peut être indisponible en navigation privée. */ }
     const savedLanguage = sessionStorage.getItem("courrier-language");
     if (savedLanguage && (languages as readonly string[]).includes(savedLanguage)) setLanguage(savedLanguage as Language);
     if (showResult) {
@@ -174,19 +242,35 @@ export default function CourrierApp({ showResult = false }: { showResult?: boole
     }
   }, [showResult]);
 
+  function changeTextScale(delta: number) {
+    setTextScale(current => {
+      const next = Math.min(1.6, Math.max(1, Math.round((current + delta) * 10) / 10));
+      try { window.localStorage.setItem("courrier-text-scale", String(next)); } catch { /* Le réglage reste actif pour cette visite. */ }
+      return next;
+    });
+  }
+
+  function toggleContrast() {
+    setHighContrast(current => {
+      const next = !current;
+      try { window.localStorage.setItem("courrier-high-contrast", String(next)); } catch { /* Le réglage reste actif pour cette visite. */ }
+      return next;
+    });
+  }
+
   function changeLanguage(nextLanguage: Language) {
     setLanguage(nextLanguage);
     sessionStorage.setItem("courrier-language", nextLanguage);
   }
 
-  async function analyze(file?: File) {
-    if (!consent) return;
+  async function analyze(file?: File, textOverride?: string) {
+    if (!consent && textOverride === undefined) return;
     setError(""); setBusy(true);
     try {
       const form = new FormData();
       form.append("language", language);
       if (file) form.append("image", file);
-      else form.append("text", text.trim());
+      else form.append("text", (textOverride ?? text).trim());
       const response = await fetch("/api/analyze", { method: "POST", body: form });
       const payload = await response.json();
       if (!response.ok) throw new Error(payload.error || t.apiError);
@@ -202,7 +286,10 @@ export default function CourrierApp({ showResult = false }: { showResult?: boole
     if (!analysis) return;
     setSpeaking(true); setError("");
     try {
-      const response = await fetch("/api/speak", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text: analysis.resume_simple, language }) });
+      const action = analysis.actions[0]?.etape || t.noActions;
+      const actionDate = analysis.actions[0]?.avant_le || displayDeadline;
+      const spokenText = `${a11y.todo}. ${a11y.primaryAction}: ${action}. ${actionDate ? `${t.deadline}: ${analysis.date_estimee ? `${t.estimated} ` : ""}${actionDate}.` : ""} ${t.summary}: ${analysis.resume_simple}`;
+      const response = await fetch("/api/speak", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text: spokenText, language }) });
       if (!response.ok) { const payload = await response.json(); throw new Error(payload.error || t.audioError); }
       const player = new Audio(URL.createObjectURL(await response.blob()));
       await player.play();
@@ -215,6 +302,48 @@ export default function CourrierApp({ showResult = false }: { showResult?: boole
     try { await navigator.clipboard.writeText(analysis.reponse_proposee); setError(t.copied); }
     catch { setError(t.copyError); }
   }
+
+  const shareMessage = analysis ? (() => {
+    const summary = firstTwoSentences(removePersonalDetails(analysis.resume_simple));
+    const action = removePersonalDetails(analysis.actions[0]?.etape || t.noActions);
+    const sender = removePersonalDetails(analysis.expediteur);
+    const date = analysis.date_limite_iso ? dateInLongLocale(analysis.date_limite_iso, language) : analysis.date_limite ? removePersonalDetails(analysis.date_limite) : "";
+    const amountMatch = `${analysis.resume_simple} ${analysis.actions.map(item => item.etape).join(" ")}`.match(/(?:\d[\d\s.,]*\s?(?:€|euros?|EUR))|(?:€\s?\d[\d\s.,]*)/i);
+    const amount = amountMatch?.[0]?.trim();
+    return [
+      `${shareText.from} : ${sender}`,
+      `${shareText.says} : ${summary}`,
+      `${shareText.action} : ${action}`,
+      date ? `${shareText.deadline} : ${analysis.date_estimee ? `${t.estimated} ` : ""}${date}` : "",
+      amount ? `${shareText.amount} : ${amount}` : "",
+    ].filter(Boolean).join("\n");
+  })() : "";
+
+  async function shareWithClosePerson() {
+    if (!shareMessage) return;
+    setShareCopied(false);
+    if (typeof navigator.share === "function") {
+      try {
+        await navigator.share({ title: shareText.title, text: shareMessage });
+        setShowShareFallback(false);
+        return;
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") return;
+      }
+    }
+    setShowShareFallback(true);
+  }
+
+  async function copyShareMessage() {
+    try {
+      await navigator.clipboard.writeText(shareMessage);
+      setShareCopied(true);
+    } catch {
+      setError(t.copyError);
+    }
+  }
+
+  const encodedShareMessage = encodeURIComponent(shareMessage);
 
   function addReminder() {
     const deadline = analysis?.date_limite_iso;
@@ -244,26 +373,36 @@ export default function CourrierApp({ showResult = false }: { showResult?: boole
 
   const urgencyText = analysis ? ({ faible: t.urgencyLow, moyenne: t.urgencyMedium, haute: t.urgencyHigh })[analysis.urgence] : "";
   const displayDeadline = analysis?.date_limite_iso ? dateInLongLocale(analysis.date_limite_iso, language) : analysis?.date_limite;
+  const primaryAction = analysis?.actions[0];
+  const primaryActionLabel = primaryAction?.etape ? removeDeadlineFromAction(primaryAction.etape) : t.noActions;
+  const primaryDateRaw = primaryAction?.avant_le || analysis?.date_limite_iso || analysis?.date_limite || "";
+  const primaryDate = primaryDateRaw ? (analysis?.date_limite_iso && primaryDateRaw === analysis.date_limite_iso ? displayDeadline : dateInLongLocale(primaryDateRaw, language)) : "";
 
-  return <main lang={localeByLanguage[language]} dir={rtl ? "rtl" : "ltr"} className="minimal-app min-h-screen px-4 py-6 sm:px-6 sm:py-10">
+  return <main lang={localeByLanguage[language]} dir={rtl ? "rtl" : "ltr"} data-contrast={highContrast ? "high" : "normal"} style={{ "--text-scale": textScale } as React.CSSProperties} className={`minimal-app min-h-screen px-4 py-6 sm:px-6 sm:py-10 ${highContrast ? "contrast-high" : ""}`}>
     <div className="mx-auto max-w-2xl">
       <header className="mb-6 flex items-center gap-3">
-        <div aria-hidden="true" className="flex h-11 w-11 items-center justify-center rounded-md bg-black text-xl font-bold text-white">D</div>
-        <div><p className="m-0 text-xl font-extrabold">Décode ton courrier</p><p className="m-0 text-base text-slate-600">{t.tagline}</p></div>
+        <div aria-hidden="true" className="brand-mark flex h-11 w-11 items-center justify-center rounded-md text-xl font-bold text-white">D</div>
+        <div><p className="m-0 text-xl font-extrabold">Décode ton courrier</p></div>
       </header>
+
+      <div role="group" aria-label={a11y.controls} className="accessibility-controls mb-5 flex flex-wrap items-center gap-3">
+        <button type="button" onClick={() => changeTextScale(-0.1)} disabled={textScale <= 1} aria-label={`${a11y.decrease} — ${a11y.controls}`} className="a11y-control">{a11y.decrease}</button>
+        <button type="button" onClick={() => changeTextScale(0.1)} disabled={textScale >= 1.6} aria-label={`${a11y.increase} — ${a11y.controls}`} className="a11y-control">{a11y.increase}</button>
+        <button type="button" onClick={toggleContrast} aria-pressed={highContrast} className="a11y-control">{a11y.contrast}{highContrast ? " ✓" : ""}</button>
+      </div>
 
       {!showResult && photoFile ? <PhotoReview file={photoFile} language={language} consent={consent} onConsentChange={setConsent} onCancel={() => { setPhotoFile(null); setConsent(false); }} onAnalyze={analyze} busy={busy} /> : !showResult ? <section className="minimal-card p-5 sm:p-8">
         <label htmlFor="language" className="mb-2 block font-bold">{t.language}</label>
         <select id="language" aria-label={t.language} value={language} onChange={e => changeLanguage(e.target.value as Language)} className="mb-6 w-full rounded-xl border-2 border-slate-300 bg-white px-4 py-3 text-lg">
           {languages.map(value => <option key={value} value={value}>{languageLabels[value]}</option>)}
         </select>
-        <p className="mb-2 text-sm font-bold uppercase tracking-wide text-[#111111]">{t.tagline}</p>
-        <h1 className="mb-3 mt-0 text-3xl font-extrabold leading-tight sm:text-4xl">{t.title}</h1>
-        <p className="mb-7 mt-0 text-lg leading-relaxed text-slate-700">{t.intro}</p>
+        <h1 className="mb-3 mt-0 text-3xl font-extrabold leading-tight sm:text-4xl">{homeCopy[language].title}</h1>
+        <p className="mb-7 mt-0 text-lg leading-relaxed text-slate-700">{homeCopy[language].subtitle}</p>
         <button type="button" onClick={() => inputRef.current?.click()} disabled={busy} aria-label={t.photo} className="minimal-primary w-full">
           {t.photo.replace("📷  ", "")}
         </button>
         <input ref={inputRef} className="hidden" type="file" accept="image/*" capture="environment" aria-hidden="true" tabIndex={-1} onChange={e => { const file = e.target.files?.[0]; if (file) { setPhotoFile(file); setConsent(false); setError(""); } e.currentTarget.value = ""; }} />
+        <button type="button" onClick={() => void analyze(undefined, exampleLetter)} disabled={busy} className="minimal-secondary mt-3 w-full">{homeCopy[language].example}</button>
         <div className="my-6 flex items-center gap-3 text-slate-500"><span className="h-px flex-1 bg-slate-200"/><span>{t.or}</span><span className="h-px flex-1 bg-slate-200"/></div>
         <label htmlFor="letter-text" className="mb-2 block font-bold">{t.text}</label>
         <textarea id="letter-text" rows={5} value={text} onChange={e => setText(e.target.value)} placeholder={t.placeholder} className="w-full rounded-xl border-2 border-slate-300 px-4 py-3 text-lg leading-relaxed" />
@@ -274,21 +413,39 @@ export default function CourrierApp({ showResult = false }: { showResult?: boole
         <button type="button" onClick={() => void analyze()} disabled={busy || !text.trim() || !consent} className="minimal-primary mt-4 w-full">{busy ? t.analyzing : t.analyze}</button>
         <p className="mt-5 text-base leading-relaxed text-neutral-600">{t.privacy}</p>
         <p className="mt-3 text-base leading-relaxed text-neutral-600">{t.caution}</p>
-      </section> : analysis ? <section className="minimal-card p-5 sm:p-8">
-        <button onClick={() => router.push("/")} className="mb-5 rounded-lg px-1 py-2 font-bold text-[#111111] underline">{t.another}</button>
-        <p className="mb-2 text-base font-bold text-slate-600">{t.from} : {analysis.expediteur}</p>
-        <div className={`mb-6 inline-flex rounded-full px-4 py-2 font-extrabold ${analysis.urgence === "haute" ? "bg-red-100 text-red-900" : analysis.urgence === "moyenne" ? "bg-amber-100 text-amber-950" : "bg-green-100 text-green-950"}`} role="status">{urgencyText}</div>
-        {displayDeadline && <p className="-mt-3 mb-5 text-lg font-bold">{t.deadline} : {analysis.date_estimee && <span>{t.estimated} </span>}{analysis.date_limite_iso ? <time dateTime={analysis.date_limite_iso}>{displayDeadline}</time> : displayDeadline}</p>}
-        <h1 className="mb-3 text-2xl font-extrabold">{t.summary}</h1>
-        <p className="whitespace-pre-line text-xl leading-relaxed">{analysis.resume_simple}</p>
-        <button onClick={() => void speak()} disabled={speaking} aria-label={t.listen} className="my-5 rounded-xl border-2 border-slate-400 px-4 py-2 text-base font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60">{speaking ? t.preparingAudio : `🔊 ${t.listen}`}</button>
-        <h2 className="mb-3 mt-5 text-xl font-extrabold">{t.actions}</h2>
-        {analysis.actions.length ? <ol className="space-y-3 ps-6">{analysis.actions.map((action, i) => <li key={i} className="ps-1 leading-relaxed"><span>{action.etape}</span>{action.avant_le && <span className="mt-1 block text-base font-bold text-[#111111]">{t.deadline} : {dateInLongLocale(action.avant_le, language)}</span>}</li>)}</ol> : <p>{t.noActions}</p>}
-        {!!analysis.documents_a_fournir.length && <><h2 className="mb-3 mt-7 text-xl font-extrabold">{t.documents}</h2><ul className="list-disc space-y-2 ps-6">{analysis.documents_a_fournir.map((item, i) => <li key={i}>{item}</li>)}</ul></>}
-        {!!analysis.reponse_proposee && <div className="mt-7 rounded-2xl bg-slate-50 p-5"><h2 className="mb-3 mt-0 text-xl font-extrabold">{t.answer}</h2><textarea readOnly dir="ltr" lang="fr" aria-label={t.answer} value={analysis.reponse_proposee} rows={9} className="w-full rounded-xl border-2 border-slate-300 bg-white p-3 text-left leading-relaxed"/><button onClick={() => void copyReply()} className="mt-3 rounded-xl border-2 border-[#111111] px-5 py-3 font-bold text-[#111111]">{t.copy}</button><details className="mt-4"><summary className="cursor-pointer rounded-lg py-2 font-semibold text-[#111111]">{t.translation}</summary><p className="whitespace-pre-line rounded-xl bg-white p-4 leading-relaxed">{analysis.reponse_traduction}</p></details></div>}
-        {!!analysis.glossaire.length && <div className="mt-7"><h2 className="mb-3 text-xl font-extrabold">{t.glossary}</h2><dl className="space-y-3">{analysis.glossaire.map((entry, i) => <div key={i} className="rounded-xl bg-slate-50 p-4"><dt className="font-bold">{entry.terme}</dt><dd className="mb-0 mt-1 leading-relaxed">{entry.explication}</dd></div>)}</dl></div>}
-        {analysis.date_limite_iso && <div className="mt-7 rounded-2xl border-2 border-slate-200 p-5"><h2 className="mb-2 mt-0 text-xl font-extrabold">{t.reminder}</h2><p className="mt-0 text-base">{t.reminderDetails}</p><div className="flex flex-wrap gap-3"><button onClick={addReminder} className="rounded-xl bg-[#111111] px-5 py-3 font-bold text-white">{t.reminder} (.ics)</button><a href={googleCalendarUrl} target="_blank" rel="noreferrer" className="inline-flex items-center rounded-xl border-2 border-[#111111] px-5 py-3 font-bold text-[#111111]">Google Calendar</a></div></div>}
-        <p className="mt-6 rounded-xl bg-slate-100 p-4 text-base leading-relaxed text-slate-700">{t.notice}</p>
+      </section> : analysis ? <section className="minimal-card p-5 sm:p-8" aria-labelledby="result-title">
+        <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">{a11y.resultReady}</div>
+        <button type="button" onClick={() => router.push("/")} className="mb-5 rounded-lg px-1 py-2 font-bold text-[#111111] underline">{t.another}</button>
+        <h1 id="result-title" className="sr-only">{t.summary}</h1>
+        <p className="mb-4 text-base font-bold text-slate-600">{t.from} : {analysis.expediteur}</p>
+        <div className="result-top mb-6">
+          <div className={`todo-card ${analysis.urgence === "haute" ? "todo-high" : analysis.urgence === "moyenne" ? "todo-medium" : "todo-low"}`}>
+            <p className="mb-2 text-lg font-extrabold uppercase tracking-wide">{a11y.todo}</p>
+            <p className="mb-3 text-2xl font-extrabold leading-snug">{primaryActionLabel}</p>
+            {primaryDate && <><p className="mb-1 text-lg font-bold">{t.deadline}</p><p className="deadline-display">{analysis.date_estimee && <span>{t.estimated} </span>}{analysis.date_limite_iso && primaryDateRaw === analysis.date_limite_iso ? <time dateTime={analysis.date_limite_iso}>{primaryDate}</time> : primaryDate}</p></>}
+            <span className="mt-3 inline-block rounded-full border-2 px-3 py-1 text-base font-bold">{urgencyText}</span>
+          </div>
+          <button type="button" onClick={() => void speak()} disabled={speaking} aria-label={`${t.listen}. ${a11y.primaryAction}, date limite, puis ${t.summary}`} className="listen-primary"><span aria-hidden="true">🔊</span> {speaking ? t.preparingAudio : t.listen}</button>
+        </div>
+        <div className="mb-6 rounded-lg border-2 border-slate-300 p-4">
+          <h2 className="mb-3 mt-0 text-lg font-extrabold">{homeCopy[language].next}</h2>
+          {analysis.date_limite_iso && <p className="mt-0 text-base">{t.reminderDetails}</p>}
+          <div className="action-buttons">
+            {analysis.date_limite_iso && <><button type="button" onClick={addReminder} className="secondary-action rounded-lg border-2 px-5 py-3 font-bold">{t.reminder} (.ics)</button><a href={googleCalendarUrl} target="_blank" rel="noreferrer" className="secondary-action inline-flex items-center rounded-lg border-2 px-5 py-3 font-bold">Google Calendar</a></>}
+            <button type="button" onClick={() => void shareWithClosePerson()} className="secondary-action rounded-lg border-2 px-5 py-3 font-bold">{shareText.button}</button>
+          </div>
+          {showShareFallback && <div className="mt-4 flex flex-wrap gap-3" aria-label={shareText.button}>
+            <a href={`https://wa.me/?text=${encodedShareMessage}`} target="_blank" rel="noreferrer" className="secondary-action inline-flex items-center rounded-lg border-2 px-5 py-3 font-bold">WhatsApp</a>
+            <a href={`sms:?body=${encodedShareMessage}`} className="secondary-action inline-flex items-center rounded-lg border-2 px-5 py-3 font-bold">SMS</a>
+            <button type="button" onClick={() => void copyShareMessage()} className="secondary-action rounded-lg border-2 px-5 py-3 font-bold">{shareCopied ? shareText.copied : shareText.copy}</button>
+          </div>}
+        </div>
+        <details className="result-section" open><summary>{t.summary}</summary><p className="whitespace-pre-line text-xl leading-relaxed">{analysis.resume_simple}</p></details>
+        <details className="result-section"><summary>{t.actions}</summary>{analysis.actions.length ? <ol className="space-y-4 ps-6">{analysis.actions.map((action, i) => <li key={i} className="ps-1 leading-relaxed"><span>{action.etape}</span>{action.avant_le && <span className="mt-1 block font-bold">{t.deadline} : {dateInLongLocale(action.avant_le, language)}</span>}</li>)}</ol> : <p>{t.noActions}</p>}</details>
+        {!!analysis.documents_a_fournir.length && <details className="result-section"><summary>{t.documents}</summary><ul className="list-disc space-y-3 ps-6">{analysis.documents_a_fournir.map((item, i) => <li key={i}>{item}</li>)}</ul></details>}
+        {!!analysis.glossaire.length && <details className="result-section"><summary>{t.glossary}</summary><dl className="space-y-3">{analysis.glossaire.map((entry, i) => <div key={i} className="rounded-lg bg-slate-50 p-4"><dt className="font-bold">{entry.terme}</dt><dd className="mb-0 mt-1 leading-relaxed">{entry.explication}</dd></div>)}</dl></details>}
+        {!!analysis.reponse_proposee && <details className="result-section"><summary>{t.answer}</summary><textarea readOnly dir="ltr" lang="fr" aria-label={t.answer} value={analysis.reponse_proposee} rows={9} className="w-full rounded-lg border-2 border-slate-300 bg-white p-3 text-left leading-relaxed"/><button type="button" onClick={() => void copyReply()} className="mt-3 rounded-lg border-2 border-[#111111] px-5 py-3 font-bold text-[#111111]">{t.copy}</button><details className="mt-4"><summary>{t.translation}</summary><p className="whitespace-pre-line rounded-lg bg-white p-4 leading-relaxed">{analysis.reponse_traduction}</p></details></details>}
+        <p className="mt-6 rounded-lg bg-slate-100 p-4 text-base leading-relaxed text-slate-700">{t.notice}</p>
       </section> : <section className="soft-shadow rounded-3xl bg-white p-6"><h1 className="text-2xl font-extrabold">{t.noResult}</h1><p>{t.start}</p><button onClick={() => router.push("/")} className="rounded-xl bg-[#111111] px-5 py-3 font-bold text-white">{t.back}</button></section>}
       {error && <p role="status" aria-live="polite" className="mt-4 rounded-xl bg-red-100 p-4 font-semibold text-red-900">{error}</p>}
       <footer className="px-2 py-6 text-center text-sm leading-relaxed text-slate-600">{t.footer}</footer>
