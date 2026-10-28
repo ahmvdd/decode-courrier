@@ -378,11 +378,11 @@ export default function CourrierApp({ showResult = false }: { showResult?: boole
   const primaryDateRaw = primaryAction?.avant_le || analysis?.date_limite_iso || analysis?.date_limite || "";
   const primaryDate = primaryDateRaw ? (analysis?.date_limite_iso && primaryDateRaw === analysis.date_limite_iso ? displayDeadline : dateInLongLocale(primaryDateRaw, language)) : "";
 
-  return <main lang={localeByLanguage[language]} dir={rtl ? "rtl" : "ltr"} data-contrast={highContrast ? "high" : "normal"} style={{ "--text-scale": textScale } as React.CSSProperties} className={`minimal-app min-h-screen px-4 py-6 sm:px-6 sm:py-10 ${highContrast ? "contrast-high" : ""}`}>
-    <div className="mx-auto max-w-2xl">
-      <header className="mb-6 flex items-center gap-3">
-        <div aria-hidden="true" className="brand-mark flex h-11 w-11 items-center justify-center rounded-md text-xl font-bold text-white">D</div>
-        <div><p className="m-0 text-xl font-extrabold">Décode ton courrier</p></div>
+  return <main lang={localeByLanguage[language]} dir={rtl ? "rtl" : "ltr"} data-contrast={highContrast ? "high" : "normal"} style={{ "--text-scale": textScale } as React.CSSProperties} className={`minimal-app ${!showResult ? "home-page" : "result-page"} min-h-screen px-4 py-6 sm:px-6 sm:py-10 ${highContrast ? "contrast-high" : ""}`}>
+    <div className={`page-container mx-auto ${showResult ? "max-w-2xl" : "max-w-5xl"}`}>
+      <header className="site-header mb-6 flex items-center gap-3">
+        <div aria-hidden="true" className="brand-mark flex h-11 w-11 items-center justify-center rounded-md text-xl font-bold text-white">D<span className="brand-dot">.</span></div>
+        <div><p className="m-0 text-xl font-extrabold">Décode ton courrier</p><p className="brand-caption m-0">{t.tagline}</p></div>
       </header>
 
       <div role="group" aria-label={a11y.controls} className="accessibility-controls mb-5 flex flex-wrap items-center gap-3">
@@ -391,15 +391,27 @@ export default function CourrierApp({ showResult = false }: { showResult?: boole
         <button type="button" onClick={toggleContrast} aria-pressed={highContrast} className="a11y-control">{a11y.contrast}{highContrast ? " ✓" : ""}</button>
       </div>
 
-      {!showResult && photoFile ? <PhotoReview file={photoFile} language={language} consent={consent} onConsentChange={setConsent} onCancel={() => { setPhotoFile(null); setConsent(false); }} onAnalyze={analyze} busy={busy} /> : !showResult ? <section className="minimal-card p-5 sm:p-8">
+      {!showResult && photoFile ? <PhotoReview file={photoFile} language={language} consent={consent} onConsentChange={setConsent} onCancel={() => { setPhotoFile(null); setConsent(false); }} onAnalyze={analyze} busy={busy} /> : !showResult ? <>
+        <section className="home-hero">
+          <div className="home-hero-copy">
+            <span className="eyebrow"><span className="eyebrow-dot" aria-hidden="true" /> {t.tagline}</span>
+            <h1 className="home-title">{homeCopy[language].title}</h1>
+            <p className="home-subtitle">{homeCopy[language].subtitle}</p>
+          </div>
+          <div className="letter-illustration" aria-hidden="true">
+            <div className="letter-sheet"><span className="letter-stamp">FR</span><span className="letter-line letter-line-short"/><span className="letter-line"/><span className="letter-line"/><span className="letter-line letter-line-mid"/><span className="letter-rule"/><span className="letter-line"/><span className="letter-line letter-line-mid"/><span className="letter-signature"/></div>
+            <span className="illustration-spark spark-one">✳</span><span className="illustration-spark spark-two">✳</span>
+          </div>
+        </section>
+        <section className="intake-card">
         <label htmlFor="language" className="mb-2 block font-bold">{t.language}</label>
         <select id="language" aria-label={t.language} value={language} onChange={e => changeLanguage(e.target.value as Language)} className="mb-6 w-full rounded-xl border-2 border-slate-300 bg-white px-4 py-3 text-lg">
           {languages.map(value => <option key={value} value={value}>{languageLabels[value]}</option>)}
         </select>
-        <h1 className="mb-3 mt-0 text-3xl font-extrabold leading-tight sm:text-4xl">{homeCopy[language].title}</h1>
-        <p className="mb-7 mt-0 text-lg leading-relaxed text-slate-700">{homeCopy[language].subtitle}</p>
-        <button type="button" onClick={() => inputRef.current?.click()} disabled={busy} aria-label={t.photo} className="minimal-primary w-full">
-          {t.photo.replace("📷  ", "")}
+        <div className="intake-heading"><span className="step-number" aria-hidden="true">01</span><div><h2>{t.photo.replace("📷  ", "")}</h2><p>{t.intro}</p></div></div>
+        <button type="button" onClick={() => inputRef.current?.click()} disabled={busy} aria-label={t.photo} className="minimal-primary photo-button w-full">
+          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="camera-icon"><path d="M4 8.5h3l1.5-2h7l1.5 2h3v10H4v-10Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round"/><circle cx="12" cy="13.5" r="3.2" stroke="currentColor" strokeWidth="1.8"/></svg>
+          <span>{t.photo.replace("📷  ", "")}</span><span className="button-arrow" aria-hidden="true">↗</span>
         </button>
         <input ref={inputRef} className="hidden" type="file" accept="image/*" capture="environment" aria-hidden="true" tabIndex={-1} onChange={e => { const file = e.target.files?.[0]; if (file) { setPhotoFile(file); setConsent(false); setError(""); } e.currentTarget.value = ""; }} />
         <button type="button" onClick={() => void analyze(undefined, exampleLetter)} disabled={busy} className="minimal-secondary mt-3 w-full">{homeCopy[language].example}</button>
@@ -413,7 +425,8 @@ export default function CourrierApp({ showResult = false }: { showResult?: boole
         <button type="button" onClick={() => void analyze()} disabled={busy || !text.trim() || !consent} className="minimal-primary mt-4 w-full">{busy ? t.analyzing : t.analyze}</button>
         <p className="mt-5 text-base leading-relaxed text-neutral-600">{t.privacy}</p>
         <p className="mt-3 text-base leading-relaxed text-neutral-600">{t.caution}</p>
-      </section> : analysis ? <section className="minimal-card p-5 sm:p-8" aria-labelledby="result-title">
+        </section>
+      </> : analysis ? <section className="minimal-card p-5 sm:p-8" aria-labelledby="result-title">
         <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">{a11y.resultReady}</div>
         <button type="button" onClick={() => router.push("/")} className="mb-5 rounded-lg px-1 py-2 font-bold text-[#111111] underline">{t.another}</button>
         <h1 id="result-title" className="sr-only">{t.summary}</h1>
